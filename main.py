@@ -39,10 +39,10 @@ parser.add_argument('-i', '--interval', type=int, metavar='', dest='interval', h
 parser.add_argument('-l', '--log', type=str, metavar='', dest='log', help='filepath of logfile')
 args = parser.parse_args()
 
-source_path = args.source
-replica_path = args.replica
+source_path = fr"{args.source}"
+replica_path = fr"{args.replica}"
 sync_interval = args.interval
-log_path = args.log
+log_path = fr"{args.log}"
 
 
 # ------ functions ------
