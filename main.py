@@ -44,20 +44,27 @@ log_path = args.log
 
 # ------ functions ------
 
-# TODO: create a function for adding to the logfile + printing to console (possibly separate)
+#  Adds performed operation to log file and prints it to console.
+def log_operation(operation, item):
+    # define log message
+    now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    message = f"{now} | {operation} {item}"
 
-def log_operation(operation):
-    print(operation)
+    # log to log file
+    with open(log_path, 'a') as f:
+        f.write(message+'\n')
 
-# TODO: If log file doesn't exist, create it, print to console. If source folder doesn't exist,
-#  create it, print to console, save to log. If replica folder doesn't exist, create from copy
-#  of source folder, print to console, save to log. Check validity of inputs.
+    # log to console
+    print(message)
 
-# TODO: create_item() function for creating newly added files/folders? (log + console)
+# TODO: If log file doesn't exist, log_operation("Created", log_path). If source folder doesn't exist,
+#  create_item(source_path). If replica folder doesn't exist, create_item(replica_path). Check validity of inputs.
 
-# TODO: delete_item() function for deleting files/folders? (log + console)
+# TODO: create_item(item) function for creating newly added files/folders? Call log_operation("Created", item)
 
-# TODO: copypaste_content() function for copying updated content of edited files? (log + console)
+# TODO: remove_item(item) function for deleting files/folders? Call log_operation("Removed", item)
+
+# TODO: copypaste_file_content(item) function for copying updated content of edited files? Call log_operation("Copied", item)
 
 # TODO: compare_files() function to compare two files for changes (unsure how at the moment). If
 #  different, call copypaste_content()
@@ -70,13 +77,16 @@ def log_operation(operation):
 
 # ------ main loop ------
 if __name__ == '__main__':
+    # checks that all args are provided, exits if not
     if not (bool(source_path) & bool(replica_path) & bool(sync_interval) & bool(log_path)):
         print("Please provide a filepath for the source folder, a filepath for the replica folder, a synchronization interval, and a filepath for the log file.")
         sys.exit()
 
+    # testing vars
     print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
 
+    # repeats according to the sync_interval
     while True:
         print(f"Program running. You should see this message again in {sync_interval} seconds.")
-        log_operation(source_path)
+        log_operation("Tested", "log_operation()")
         time.sleep(sync_interval)
