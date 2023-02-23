@@ -70,14 +70,18 @@ def log_operation(operation, item):
     # log to console
     print(message)
 
-# TODO: create_item(item) function for creating newly added files/folders? Call log_operation("Created", item)
+# creates a file in the replica folder by copying it from the source folder
 def create_file(file):
     src_path = os.path.join(source_path, file)
     dest_path = os.path.join(replica_path, file)
     shutil.copy2(src_path, dest_path)
     log_operation("Created", dest_path)
 
-# TODO: remove_item(item) function for deleting files/folders? Call log_operation("Removed", item)
+# removes a file from replica folder (used if file not in source folder)
+def remove_file(file):
+    filepath = os.path.join(replica_path, file)
+    os.remove(filepath)
+    log_operation("Removed", filepath)
 
 # TODO: copypaste_file_content(item) function for copying updated content of edited files? Call log_operation("Copied", item)
 
@@ -123,11 +127,10 @@ if __name__ == '__main__':
     # show vars
     print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
 
-    create_file("file1.txt")
-
     # repeats according to the sync_interval
     while True:
         print(f"Program running. You should see this message again in {sync_interval} seconds.")
+
         time.sleep(sync_interval)
 
     # will need the following while checking through folder, I think?
