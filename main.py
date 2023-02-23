@@ -65,14 +65,17 @@ def log_operation(operation, item):
 
     # log to log file
     with open(log_path, 'a') as f:
-        f.write(message+'\n')
+        f.write(message + '\n')
 
     # log to console
     print(message)
 
 # TODO: create_item(item) function for creating newly added files/folders? Call log_operation("Created", item)
-def create_item(item):
-    print("hi")
+def create_file(file):
+    src_path = os.path.join(source_path, file)
+    dest_path = os.path.join(replica_path, file)
+    shutil.copy2(src_path, dest_path)
+    log_operation("Created", dest_path)
 
 # TODO: remove_item(item) function for deleting files/folders? Call log_operation("Removed", item)
 
@@ -119,6 +122,8 @@ if __name__ == '__main__':
 
     # show vars
     print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
+
+    create_file("file1.txt")
 
     # repeats according to the sync_interval
     while True:
