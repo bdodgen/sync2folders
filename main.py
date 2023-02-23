@@ -20,7 +20,10 @@
 # printed to the console
 
 import argparse
+import hashlib
+import os
 import sys
+from concurrent.futures import ThreadPoolExecutor
 import time
 
 # parsing arguments and assigning them to variables for cleanliness
@@ -57,22 +60,35 @@ def log_operation(operation, item):
     # log to console
     print(message)
 
-# TODO: If log file doesn't exist, log_operation("Created", log_path). If source folder doesn't exist,
-#  create_item(source_path). If replica folder doesn't exist, create_item(replica_path). Check validity of inputs.
-
 # TODO: create_item(item) function for creating newly added files/folders? Call log_operation("Created", item)
+def create_item(item):
+    print("hi")
 
 # TODO: remove_item(item) function for deleting files/folders? Call log_operation("Removed", item)
 
 # TODO: copypaste_file_content(item) function for copying updated content of edited files? Call log_operation("Copied", item)
 
-# TODO: compare_files() function to compare two files for changes (unsure how at the moment). If
-#  different, call copypaste_content()
+# compares two files. If they are the same, returns True. If not, False.
+def compare_files(file1, file2):
+    # compare two files with hash
+    with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            future1 = executor.submit(hashlib.sha256, f1.read())
+            future2 = executor.submit(hashlib.sha256, f2.read())
+            if future1.result().hexdigest() == future2.result().hexdigest():
+                return True
+            else:
+                return False
+
+# TODO: Probably need in the main loop -- If compare_files() returns false, call copypaste_content()
 
 # TODO: compare_folders() function to compare the folders for changes (unsure how at the moment).
 #  If files/folders in replica that are absent in source, call delete_item(). If files/folders absent
 #  in replica that are present in source, call create_item(). Call compare_files() to find changes.
 #  Do I need something recursive to search through subfolders?
+
+# TODO: If source folder doesn't exist,
+#  create_item(source_path). If replica folder doesn't exist, create_item(replica_path). Check validity of inputs.
 
 
 # ------ main loop ------
@@ -82,11 +98,14 @@ if __name__ == '__main__':
         print("Please provide a filepath for the source folder, a filepath for the replica folder, a synchronization interval, and a filepath for the log file.")
         sys.exit()
 
-    # testing vars
+    # show vars
     print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
 
     # repeats according to the sync_interval
     while True:
         print(f"Program running. You should see this message again in {sync_interval} seconds.")
-        log_operation("Tested", "log_operation()")
         time.sleep(sync_interval)
+
+    # will need the following while checking through folder, I think?
+    # if not os.path.exists(item_path):
+    #     create_item(item_path)
