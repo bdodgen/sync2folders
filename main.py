@@ -4,7 +4,7 @@
 # TODO: Synchronization must be one-way: after the synchronization content of the replica
 #  folder should be modified to exactly match content of the source folder
 #
-# TODO: Synchronization should be performed periodically.
+# DONE: Synchronization should be performed periodically.
 #
 # TODO: File creation/copying/removal operations should be logged to a file and to the
 #  console output
@@ -20,6 +20,7 @@
 # printed to the console
 
 import argparse
+import time
 
 # parsing arguments and assigning them to variables for cleanliness
 parser = argparse.ArgumentParser(description='Synchronize replica folder to source folder.')
@@ -33,8 +34,6 @@ source_path = args.source
 replica_path = args.replica
 sync_interval = args.interval
 log_path = args.log
-
-# TODO: make the program run according to the sync interval
 
 # TODO: create a function for adding to the logfile + printing to console (possibly separate)
 
@@ -59,6 +58,7 @@ log_path = args.log
 
 # main loop
 if __name__ == '__main__':
-    print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
-    # print(f"Program running. You should see this message again in {sync_interval} seconds.")
-
+    # print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
+    while True:
+        print(f"Program running. You should see this message again in {sync_interval} seconds.")
+        time.sleep(sync_interval)
