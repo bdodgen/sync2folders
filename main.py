@@ -9,7 +9,7 @@
 # TODO: File creation/copying/removal operations should be logged to a file and to the
 #  console output
 #
-# TODO: Folder paths, synchronization interval and log file path should be provided using the
+# DONE: Folder paths, synchronization interval and log file path should be provided using the
 #  command line arguments
 
 
@@ -19,8 +19,20 @@
 # creation/copying/removal operations are logged into file specified in CLI arguments as well as
 # printed to the console
 
-# TODO: use argparse to pull folder paths, synchronization interval, and log file path from the
-#  command line arguments and save as variables
+import argparse
+
+# parsing arguments and assigning them to variables for cleanliness
+parser = argparse.ArgumentParser(description='Synchronize replica folder to source folder.')
+parser.add_argument('source_path', type=str, help='filepath of source folder')
+parser.add_argument('replica_path', type=str, help='filepath of replica folder')
+parser.add_argument('sync_interval', type=int, help='sync interval in seconds')
+parser.add_argument('log_path', type=str, help='filepath of logfile')
+args = parser.parse_args()
+
+source_path = args.source_path
+replica_path = args.replica_path
+sync_interval = args.sync_interval
+log_path = args.log_path
 
 # TODO: make the program run according to the sync interval
 
@@ -47,5 +59,6 @@
 
 # main loop
 if __name__ == '__main__':
-    print('Folder synchronization project.')
+    print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
+    # print(f"Program running. You should see this message again in {sync_interval} seconds.")
 
