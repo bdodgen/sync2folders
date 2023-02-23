@@ -23,16 +23,16 @@ import argparse
 
 # parsing arguments and assigning them to variables for cleanliness
 parser = argparse.ArgumentParser(description='Synchronize replica folder to source folder.')
-parser.add_argument('source_path', type=str, help='filepath of source folder')
-parser.add_argument('replica_path', type=str, help='filepath of replica folder')
-parser.add_argument('sync_interval', type=int, help='sync interval in seconds')
-parser.add_argument('log_path', type=str, help='filepath of logfile')
+parser.add_argument('-s', '--source', type=str, metavar='', required=True, help='filepath of source folder')
+parser.add_argument('-r', '--replica', type=str, metavar='', required=True, help='filepath of replica folder')
+parser.add_argument('-i', '--interval', type=int, metavar='', required=True, help='sync interval in seconds')
+parser.add_argument('-l', '--log', type=str, metavar='', required=True, help='filepath of logfile')
 args = parser.parse_args()
 
-source_path = args.source_path
-replica_path = args.replica_path
-sync_interval = args.sync_interval
-log_path = args.log_path
+source_path = args.source
+replica_path = args.replica
+sync_interval = args.interval
+log_path = args.log
 
 # TODO: make the program run according to the sync interval
 
