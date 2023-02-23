@@ -20,10 +20,11 @@
 # printed to the console
 
 import argparse
-import hashlib
+# import hashlib
 import os
+import shutil
 import sys
-from concurrent.futures import ThreadPoolExecutor
+# from concurrent.futures import ThreadPoolExecutor
 import time
 
 # parsing arguments and assigning them to variables for cleanliness
@@ -47,6 +48,15 @@ log_path = fr"{args.log}"
 
 # ------ functions ------
 
+# takes a directory path as input and returns a list of relative file paths for all files in that
+# directory and its subdirectories
+def get_files_recursive(directory):
+    files = []
+    for dirpath, _, filenames in os.walk(directory):
+        for filename in filenames:
+            files.append(os.path.relpath(os.path.join(dirpath, filename), directory))
+    return files
+
 #  Adds performed operation to log file and prints it to console.
 def log_operation(operation, item):
     # define log message
@@ -68,17 +78,17 @@ def create_item(item):
 
 # TODO: copypaste_file_content(item) function for copying updated content of edited files? Call log_operation("Copied", item)
 
-# compares two files. If they are the same, returns True. If not, False.
-def compare_files(file1, file2):
-    # compare two files with hash
-    with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            future1 = executor.submit(hashlib.sha256, f1.read())
-            future2 = executor.submit(hashlib.sha256, f2.read())
-            if future1.result().hexdigest() == future2.result().hexdigest():
-                return True
-            else:
-                return False
+# TODO: Useless??? # compares two files. If they are the same, returns True. If not, False.
+# def compare_files(file1, file2):
+#     # compare two files with hash
+#     with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
+#         with ThreadPoolExecutor(max_workers=2) as executor:
+#             future1 = executor.submit(hashlib.sha256, f1.read())
+#             future2 = executor.submit(hashlib.sha256, f2.read())
+#             if future1.result().hexdigest() == future2.result().hexdigest():
+#                 return True
+#             else:
+#                 return False
 
 # TODO: Probably need in the main loop -- If compare_files() returns false, call copypaste_content()
 
@@ -86,6 +96,15 @@ def compare_files(file1, file2):
 #  If files/folders in replica that are absent in source, call delete_item(). If files/folders absent
 #  in replica that are present in source, call create_item(). Call compare_files() to find changes.
 #  Do I need something recursive to search through subfolders?
+
+def compare_folders():
+    source_filetree = os.walk(source_path)
+    replica_filetree = os.walk(replica_path)
+
+    if source_filetree == replica_filetree:
+        return True
+    else:
+        return False
 
 # TODO: If source folder doesn't exist,
 #  create_item(source_path). If replica folder doesn't exist, create_item(replica_path). Check validity of inputs.
