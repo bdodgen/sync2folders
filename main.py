@@ -96,6 +96,7 @@ def remove_file(file):
 
 
 # ------ main loop ------
+
 if __name__ == '__main__':
     # checks that all args are provided, exits if not
     if not (bool(source_path) & bool(replica_path) & bool(sync_interval) & bool(log_path)):
@@ -112,10 +113,12 @@ if __name__ == '__main__':
         source_files = get_files_recursive(source_path)
         replica_files = get_files_recursive(replica_path)
 
-        # Check for files that need to be created in replica folder
+        # Check for files that need to be created/updated in replica folder
         for file in source_files:
             if file not in replica_files:
                 create_file(file)
+            # if file is a file (not directory) checks for differences in source and replica files
+            # and updates the replica file if necessary
             elif os.path.isfile(os.path.join(source_path, file)):
                 compare_files(file)
 
@@ -124,8 +127,6 @@ if __name__ == '__main__':
             if file not in source_files:
                 remove_file(file)
 
+        # TODO: give a way to exit that's not CTRL+C ??
         time.sleep(sync_interval)
 
-    # will need the following while checking through folder, I think?
-    # if not os.path.exists(item_path):
-    #     create_item(item_path)
