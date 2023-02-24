@@ -6,7 +6,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 import time
 
-# parsing arguments and assigning them to variables for cleanliness
+# parses arguments
 parser = argparse.ArgumentParser(description='Synchronize replica folder to source folder.')
 parser.add_argument('source', type=str, metavar='', nargs='?', help='filepath of source folder')
 parser.add_argument('replica', type=str, metavar='', nargs='?', help='filepath of replica folder')
@@ -19,6 +19,7 @@ parser.add_argument('-i', '--interval', type=int, metavar='', dest='interval', h
 parser.add_argument('-l', '--log', type=str, metavar='', dest='log', help='filepath of logfile')
 args = parser.parse_args()
 
+# assigning args to variables for cleanliness and to make filenames containing "\" usable
 source_path = fr"{args.source}"
 replica_path = fr"{args.replica}"
 sync_interval = args.interval
@@ -27,7 +28,7 @@ log_path = fr"{args.log}"
 
 # ------ functions ------
 
-# compares two files. If they are the same, returns True. If not, False.
+# compares two files. If they are the different, replaces replica file content
 def compare_files(file):
     src_file = os.path.join(source_path, file)
     rep_file = os.path.join(replica_path, file)
