@@ -1,24 +1,3 @@
-# TODO: Please implement a program that synchronizes two folders: source and replica. The
-#  program should maintain a full, identical copy of source folder at replica folder.
-#
-# TODO: Synchronization must be one-way: after the synchronization content of the replica
-#  folder should be modified to exactly match content of the source folder
-#
-# DONE: Synchronization should be performed periodically.
-#
-# TODO: File creation/copying/removal operations should be logged to a file and to the
-#  console output
-#
-# DONE: Folder paths, synchronization interval and log file path should be provided using the
-#  command line arguments
-
-
-# This is a program that synchronizes two folders: source and replica. The
-# program should maintain a full, identical copy of source folder at replica folder. Synchronization
-# is performed at interval specified in CLI arguments and is only one way: source -> replica. File
-# creation/copying/removal operations are logged into file specified in CLI arguments as well as
-# printed to the console
-
 import argparse
 import hashlib
 import os
@@ -48,6 +27,36 @@ log_path = fr"{args.log}"
 
 # ------ functions ------
 
+# compares two files. If they are the same, returns True. If not, False.
+def compare_files(file):
+    src_file = os.path.join(source_path, file)
+    rep_file = os.path.join(replica_path, file)
+
+    # compare two files with hash
+    with open(src_file, 'rb') as f1, open(rep_file, 'rb') as f2:
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            future1 = executor.submit(hashlib.sha256, f1.read())
+            future2 = executor.submit(hashlib.sha256, f2.read())
+            if future1.result().hexdigest() != future2.result().hexdigest():
+                copypaste_file_content(src_file, rep_file)
+
+# copies content from source folder file to existing replica folder file, logs it
+def copypaste_file_content(src_file, rep_file):
+    shutil.copyfile(src_file, rep_file)
+    log_operation(f"Copied {src_file} to", rep_file)
+
+# creates a file in the replica folder by copying it from the source folder, logs it
+def create_file(file):
+    src_path = os.path.join(source_path, file)
+    dest_path = os.path.join(replica_path, file)
+
+    if os.path.isfile(src_path):
+        shutil.copy2(src_path, dest_path)
+    elif os.path.isdir(src_path):
+        os.mkdir(dest_path)
+
+    log_operation("Created", dest_path)
+
 # takes a directory path as input and returns a list of relative file paths for all files in that
 # directory and its subdirectories
 def get_files_recursive(directory):
@@ -74,18 +83,7 @@ def log_operation(operation, item):
     # log to console
     print(message)
 
-# creates a file in the replica folder by copying it from the source folder
-def create_file(file):
-    src_path = os.path.join(source_path, file)
-    dest_path = os.path.join(replica_path, file)
-
-    if os.path.isfile(src_path):
-        shutil.copy2(src_path, dest_path)
-    elif os.path.isdir(src_path):
-        os.mkdir(dest_path)
-    log_operation("Created", dest_path)
-
-# removes a file from replica folder (used if file not in source folder)
+# removes a file from replica folder (used if file not in source folder), logs it
 def remove_file(file):
     filepath = os.path.join(replica_path, file)
 
@@ -95,41 +93,6 @@ def remove_file(file):
         shutil.rmtree(filepath)
 
     log_operation("Removed", filepath)
-
-# TODO: copypaste_file_content(item) function for copying updated content of edited files? Call log_operation("Copied", item)
-
-# compares two files. If they are the same, returns True. If not, False.
-def compare_files(file1, file2):
-    # compare two files with hash
-    with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            future1 = executor.submit(hashlib.sha256, f1.read())
-            future2 = executor.submit(hashlib.sha256, f2.read())
-            if future1.result().hexdigest() == future2.result().hexdigest():
-                return True
-            else:
-                return False
-
-# TODO: Probably need in the main loop -- If compare_files() returns false, call copypaste_content()
-
-# TODO: compare_folders() function to compare the folders for changes (unsure how at the moment).
-#  If files/folders in replica that are absent in source, call delete_item(). If files/folders absent
-#  in replica that are present in source, call create_item(). Call compare_files() to find changes.
-#  Do I need something recursive to search through subfolders?
-
-
-# TODO: Useless???
-# def compare_folders():
-#     source_filetree = os.walk(source_path)
-#     replica_filetree = os.walk(replica_path)
-#
-#     if source_filetree == replica_filetree:
-#         return True
-#     else:
-#         return False
-
-# TODO: If source folder doesn't exist,
-#  create_item(source_path). If replica folder doesn't exist, create_item(replica_path). Check validity of inputs.
 
 
 # ------ main loop ------
@@ -153,6 +116,8 @@ if __name__ == '__main__':
         for file in source_files:
             if file not in replica_files:
                 create_file(file)
+            elif os.path.isfile(os.path.join(source_path, file)):
+                compare_files(file)
 
         # Check for files that need to be deleted from replica folder
         for file in replica_files:
