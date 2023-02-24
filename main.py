@@ -9,7 +9,6 @@ import argparse
 import hashlib
 import os
 import shutil
-import sys
 import time
 
 # Third-party library imports
@@ -17,15 +16,11 @@ from concurrent.futures import ThreadPoolExecutor
 
 # parses arguments
 parser = argparse.ArgumentParser(description='Synchronize replica folder to source folder.')
-parser.add_argument('source', type=str, metavar='', nargs='?', help='filepath of source folder')
-parser.add_argument('replica', type=str, metavar='', nargs='?', help='filepath of replica folder')
-parser.add_argument('interval', type=int, metavar='', nargs='?', help='sync interval in seconds')
-parser.add_argument('log', type=str, metavar='', nargs='?', help='filepath of logfile')
+parser.add_argument('-s', '--source', type=str, metavar='', required=True, help='filepath of source folder')
+parser.add_argument('-r', '--replica', type=str, metavar='', required=True, help='filepath of replica folder')
+parser.add_argument('-i', '--interval', type=int, metavar='', required=True, help='sync interval in seconds')
+parser.add_argument('-l', '--log', type=str, metavar='', required=True, help='filepath of logfile')
 
-parser.add_argument('-s', '--source', type=str, metavar='', dest='source', help='filepath of source folder')
-parser.add_argument('-r', '--replica', type=str, metavar='', dest='replica', help='filepath of replica folder')
-parser.add_argument('-i', '--interval', type=int, metavar='', dest='interval', help='sync interval in seconds')
-parser.add_argument('-l', '--log', type=str, metavar='', dest='log', help='filepath of logfile')
 args = parser.parse_args()
 
 # assigning args to variables for cleanliness and to make filenames containing "\" usable
@@ -66,6 +61,19 @@ def create_file(file):
         os.mkdir(dest_path)
 
     log_operation("Created", dest_path)
+
+# creates empty base folders/file as needed
+def create_logfile(path):
+    if not os.path.exists(path):
+        with open(log_path, mode='a'): pass
+
+    log_operation("Created", path)
+
+def create_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    log_operation("Created", path)
 
 # takes a directory path as input and returns a list of relative file paths for all files in that
 # directory and its subdirectories
@@ -108,16 +116,15 @@ def remove_file(file):
 # ------ MAIN LOOP ------
 
 if __name__ == '__main__':
-    # checks that all args are provided, exits if not
-    if not (bool(source_path) & bool(replica_path) & bool(sync_interval) & bool(log_path)):
-        print("Please provide all of the following: \n"
-              " * a filepath for the source folder, \n"
-              " * a filepath for the replica folder, \n"
-              " * a synchronization interval, \n"
-              " * and a filepath for the log file.")
-        sys.exit()
 
-# repeats according to the sync_interval
+    executor = ThreadPoolExecutor(max_workers=2)
+
+    # create base folders or file if they do not already exist
+    create_dir(source_path)
+    create_dir(replica_path)
+    create_logfile(log_path)
+
+    # repeats according to the sync_interval
     while True:
         source_files = get_files_recursive(source_path)
         replica_files = get_files_recursive(replica_path)
@@ -129,7 +136,13 @@ if __name__ == '__main__':
             # if file is a file (not directory) checks for differences in source and replica files
             # and updates the replica file if necessary
             elif os.path.isfile(os.path.join(source_path, file)):
-                compare_files(file)
+                # Pass the executor object as an argument to the function call
+                executor.submit(compare_files, file)
+
+        # Check for files that need to be deleted from replica folder
+        for file in replica_files:
+            if file not in source_files:
+                remove_file(file)
 
         # Check for files that need to be deleted from replica folder
         for file in replica_files:

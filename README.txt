@@ -4,9 +4,9 @@ CLI arguments and is only one way: source -> replica. File creation/copying/remo
 into file specified in CLI arguments as well as printed to the console.
 
 CLI command to run the program with positional args:
-python3 main.py [filepath of source folder] [filepath of replica folder] [sync interval in seconds] [filepath of logfile]
+python3 main.py [args]
 
-The args can also be assigned with the following flags:
+All four args must be assigned with the following flags:
   -s , --source     filepath of source folder
   -r , --replica    filepath of replica folder
   -i , --interval   sync interval in seconds
