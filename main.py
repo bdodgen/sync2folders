@@ -35,7 +35,7 @@ sync_interval = args.interval
 log_path = fr"{args.log}"
 
 
-# ------ functions ------
+# ------ FUNCTIONS ------
 
 # compares two files. If they are the different, replaces replica file content
 def compare_files(file):
@@ -105,7 +105,7 @@ def remove_file(file):
     log_operation("Removed", filepath)
 
 
-# ------ main loop ------
+# ------ MAIN LOOP ------
 
 if __name__ == '__main__':
     # checks that all args are provided, exits if not
