@@ -103,13 +103,8 @@ if __name__ == '__main__':
         print("Please provide a filepath for the source folder, a filepath for the replica folder, a synchronization interval, and a filepath for the log file.")
         sys.exit()
 
-    # show vars
-    print(f"Source: {source_path} \n Replica: {replica_path} \n Interval: {sync_interval} \n Logfile: {log_path}")
-
-    # repeats according to the sync_interval
+# repeats according to the sync_interval
     while True:
-        print(f"Program running. You should see this message again in {sync_interval} seconds.")
-
         source_files = get_files_recursive(source_path)
         replica_files = get_files_recursive(replica_path)
 
