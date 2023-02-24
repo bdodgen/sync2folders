@@ -2,7 +2,7 @@
 # program should maintain a full, identical copy of source folder at replica folder. Synchronization
 # is performed at interval specified in CLI arguments and is only one way: source -> replica. File
 # creation/copying/removal operations are logged into file specified in CLI arguments as well as
-# printed to the console
+# printed to the console.
 
 # Standard library imports
 import argparse

@@ -1,3 +1,8 @@
+This is a program that synchronizes two folders: source and replica. The program should maintain a full,
+identical copy of source folder at replica folder. Synchronization is performed at interval specified in
+CLI arguments and is only one way: source -> replica. File creation/copying/removal operations are logged
+into file specified in CLI arguments as well as printed to the console.
+
 CLI command to run the program with positional args:
 python3 main.py [filepath of source folder] [filepath of replica folder] [sync interval in seconds] [filepath of logfile]
 
