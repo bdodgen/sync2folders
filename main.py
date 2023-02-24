@@ -1,10 +1,19 @@
+# This is a program that synchronizes two folders: source and replica. The
+# program should maintain a full, identical copy of source folder at replica folder. Synchronization
+# is performed at interval specified in CLI arguments and is only one way: source -> replica. File
+# creation/copying/removal operations are logged into file specified in CLI arguments as well as
+# printed to the console
+
+# Standard library imports
 import argparse
 import hashlib
 import os
 import shutil
 import sys
-from concurrent.futures import ThreadPoolExecutor
 import time
+
+# Third-party library imports
+from concurrent.futures import ThreadPoolExecutor
 
 # parses arguments
 parser = argparse.ArgumentParser(description='Synchronize replica folder to source folder.')
@@ -101,7 +110,11 @@ def remove_file(file):
 if __name__ == '__main__':
     # checks that all args are provided, exits if not
     if not (bool(source_path) & bool(replica_path) & bool(sync_interval) & bool(log_path)):
-        print("Please provide a filepath for the source folder, a filepath for the replica folder, a synchronization interval, and a filepath for the log file.")
+        print("Please provide all of the following: \n"
+              " * a filepath for the source folder, \n"
+              " * a filepath for the replica folder, \n"
+              " * a synchronization interval, \n"
+              " * and a filepath for the log file.")
         sys.exit()
 
 # repeats according to the sync_interval
@@ -123,6 +136,4 @@ if __name__ == '__main__':
             if file not in source_files:
                 remove_file(file)
 
-        # TODO: give a way to exit that's not CTRL+C ??
         time.sleep(sync_interval)
-
