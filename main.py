@@ -52,9 +52,13 @@ log_path = fr"{args.log}"
 # directory and its subdirectories
 def get_files_recursive(directory):
     files = []
-    for dirpath, _, filenames in os.walk(directory):
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for dirname in dirnames:
+            if not dirname.startswith('.'):
+                files.append(os.path.relpath(os.path.join(dirpath, dirname), directory))
         for filename in filenames:
-            files.append(os.path.relpath(os.path.join(dirpath, filename), directory))
+            if not filename.startswith('.'):
+                files.append(os.path.relpath(os.path.join(dirpath, filename), directory))
     return files
 
 #  Adds performed operation to log file and prints it to console.
@@ -74,13 +78,22 @@ def log_operation(operation, item):
 def create_file(file):
     src_path = os.path.join(source_path, file)
     dest_path = os.path.join(replica_path, file)
-    shutil.copy2(src_path, dest_path)
+
+    if os.path.isfile(src_path):
+        shutil.copy2(src_path, dest_path)
+    elif os.path.isdir(src_path):
+        os.mkdir(dest_path)
     log_operation("Created", dest_path)
 
 # removes a file from replica folder (used if file not in source folder)
 def remove_file(file):
     filepath = os.path.join(replica_path, file)
-    os.remove(filepath)
+
+    if os.path.isfile(filepath):
+        os.remove(filepath)
+    elif os.path.isdir(filepath):
+        shutil.rmtree(filepath)
+
     log_operation("Removed", filepath)
 
 # TODO: copypaste_file_content(item) function for copying updated content of edited files? Call log_operation("Copied", item)
