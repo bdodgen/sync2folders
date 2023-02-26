@@ -144,9 +144,4 @@ if __name__ == '__main__':
             if file not in source_files:
                 remove_file(file)
 
-        # Check for files that need to be deleted from replica folder
-        for file in replica_files:
-            if file not in source_files:
-                remove_file(file)
-
         time.sleep(sync_interval)
